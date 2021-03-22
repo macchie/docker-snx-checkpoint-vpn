@@ -279,13 +279,9 @@ ssh server.example.com
 
 # Troubleshooting
 
-This image has just been tested without username and with certificate, and with snx build 800007075 obtained from:
+This image has just been tested without username and with certificate, and with snx build 800010003 obtained from:
 
-https://www.fc.up.pt/ci/servicos/acesso/vpn/software/CheckPointVPN_SNX_Linux_800007075.sh
-
-If you can't connect to your Checkpoint VPN server try using other SNX builds, for instance:
-
-https://supportcenter.checkpoint.com/supportcenter/portal/user/anon/page/default.psml/media-type/html?action=portlets.DCFileAction&eventSubmit_doGetdcdetails=&fileid=8993
+https://supportcenter.checkpoint.com/supportcenter/portal/user/anon/page/default.psml/media-type/html?action=portlets.DCFileAction&eventSubmit_doGetdcdetails=&fileid=22824
 
 If the container started up you could quickly test the new SNX build as follows:
 
