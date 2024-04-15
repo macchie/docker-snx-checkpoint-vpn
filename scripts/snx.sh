@@ -27,21 +27,28 @@ certificate_path="/certificate.p12"
 
 if [ -f "$certificate_path" ]; then
     if [ ! -z "$user" ]; then
-        echo -e "$SNX_PASSWORD\ny" | snx -s $server -u $user -c $certificate_path
+        echo -e "$SNX_PASSWORD\ny" | snx -g -s $server -u $user -c $certificate_path
     else
-        echo -e "$SNX_PASSWORD\ny" | snx -s $server -c $certificate_path
+        echo -e "$SNX_PASSWORD\ny" | snx -g -s $server -c $certificate_path
     fi
 else
-    echo -e "$SNX_PASSWORD\ny" | snx -s $server -u $user
+    echo -e "$SNX_PASSWORD\ny" | snx -g -s $server -u $user
 fi
 
-# alt method
-# snx -s $server -c $certificate_path << 'EOF'
-# mypass
-# y
-# EOF
+echo -e "\n"
 
-iptables -t nat -A POSTROUTING -o tunsnx -j MASQUERADE
+VPN_IP_ADDRESS=$(ip -4 addr show tunsnx | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+# Check if we successfully got the IP
+if [ -z "$VPN_IP_ADDRESS" ]; then
+    echo "No IP address found for interface tunsnx."
+    exit 0
+else
+    echo "IP address of tunsnx is $VPN_IP_ADDRESS"
+fi
+
+# iptables -t nat -A POSTROUTING -o tunsnx -j MASQUERADE
+iptables -t nat -A POSTROUTING -o tunsnx -j SNAT --to-source $VPN_IP_ADDRESS
 iptables -A FORWARD -i eth0 -j ACCEPT
 
 /bin/bash

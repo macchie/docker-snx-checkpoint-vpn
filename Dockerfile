@@ -1,31 +1,25 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 ADD scripts/snx_install.sh /root
 
 RUN mkdir /dev/net \
   && mknod /dev/net/tun c 10 200 \
-  && chmod 0666 /dev/net/tun \
-  && dpkg --add-architecture i386 \
-  && echo "LINUX KERNEL VERSION:" \
-  && uname -r \
-  && apt-get update \
+  && chmod 0666 /dev/net/tun
+
+RUN dpkg --add-architecture i386
+
+RUN apt-get update \
   && apt-mark hold grub* grub*:i386 \
   && apt-get install -y apt --no-install-recommends \
   && apt-get install -y kmod --no-install-recommends \
   && apt-get install -y --no-install-recommends --reinstall linux-headers-$(uname -r) \
   && apt-get install -y --no-install-recommends --reinstall linux-image-$(uname -r) \
   && apt-get update -y \
-  && apt-get upgrade -y \
-#  && dpkg-reconfigure linux-image-$(uname -r) \
-  && echo "#############################################" \
-  && echo "### INSTALLED apt AND kmod NOW RUN depmod ###" \
-  && echo "#############################################" \
-  && depmod \
-  && echo "#############################################" \
-  && echo "### depmod HAS BEEN RUN #####################" \
-  && echo "#############################################" 
+  && apt-get upgrade -y
 
-RUN apt-get install -y --no-install-recommends bzip2 kmod libstdc++5:i386 libpam0g:i386 libx11-6:i386 expect iptables net-tools iputils-ping iproute2
+RUN depmod
+
+RUN apt-get install -y --no-install-recommends bzip2 kmod libstdc++6:i386 libstdc++5:i386 libpam0g:i386 libx11-6:i386 expect iptables net-tools iputils-ping iproute2
 
 RUN modprobe tun   
 
