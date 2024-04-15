@@ -25,6 +25,26 @@ user=$SNX_USER
 password=$SNX_PASSWORD
 certificate_path="/certificate.p12"
 
+# Function to perform cleanup or other commands when SIGTERM is received
+handle_sigterm() {
+    echo -e "\nReceived SIGTERM, disconnecting SNX Client..."
+    snx -d
+    exit 0
+}
+
+# Function to perform cleanup or other commands when SIGTERM is received
+handle_sigkill() {
+    echo -e "\nReceived SIGKILL, disconnecting SNX Client..."
+    snx -d
+    exit 0
+}
+
+# Trap SIGTERM
+trap 'handle_sigterm' SIGTERM
+trap 'handle_sigkill' SIGKILL
+
+snx -d
+
 if [ -f "$certificate_path" ]; then
     if [ ! -z "$user" ]; then
         echo -e "$SNX_PASSWORD\ny" | snx -g -s $server -u $user -c $certificate_path
@@ -42,6 +62,7 @@ VPN_IP_ADDRESS=$(ip -4 addr show tunsnx | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 # Check if we successfully got the IP
 if [ -z "$VPN_IP_ADDRESS" ]; then
     echo "No IP address found for interface tunsnx."
+    snx -d
     exit 0
 else
     echo "IP address of tunsnx is $VPN_IP_ADDRESS"
